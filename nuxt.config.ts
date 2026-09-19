@@ -15,7 +15,11 @@ export default defineNuxtConfig({
   ],
   css: ['@/assets/css/tailwind.css'],
   runtimeConfig: {
-    siteToken: process.env.NUXT_SITE_TOKEN || randomBytes(32).toString('base64url'),
+    // Random per-build fallbacks keep authentication fail-closed when runtime
+    // secrets are unavailable. NUXT_SITE_TOKEN and NUXT_API_TOKEN override
+    // these values at runtime.
+    siteToken: randomBytes(32).toString('base64url'),
+    apiToken: randomBytes(32).toString('base64url'),
     cfAccessTeamDomain: '',
     cfAccessAud: '',
     redirectStatusCode: '301',

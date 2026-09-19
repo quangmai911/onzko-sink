@@ -27,28 +27,38 @@ function isHandledValidationError(error: unknown): error is HandledValidationErr
     && data.stack.includes('validateData')
 }
 
-export default defineConfig(async ({ mode }) => ({
-  plugins: [
-    cloudflareTest({
-      wrangler: {
-        configPath: './wrangler.jsonc',
-      },
-      miniflare: {
-        cf: true,
-        bindings: {
-          TEST_MIGRATIONS: await readD1Migrations('./drizzle'),
+export default defineConfig(async ({ mode }) => {
+  const testEnv = loadEnv(mode, process.cwd(), '')
+
+  return {
+    plugins: [
+      cloudflareTest({
+        wrangler: {
+          configPath: './wrangler.jsonc',
         },
+        miniflare: {
+          cf: true,
+          bindings: {
+            TEST_MIGRATIONS: await readD1Migrations('./drizzle'),
+            ...(testEnv.NUXT_SITE_TOKEN
+              ? { NUXT_SITE_TOKEN: testEnv.NUXT_SITE_TOKEN }
+              : {}),
+            ...(testEnv.NUXT_API_TOKEN
+              ? { NUXT_API_TOKEN: testEnv.NUXT_API_TOKEN }
+              : {}),
+          },
+        },
+      }),
+    ],
+    test: {
+      env: testEnv,
+      isolate: false,
+      maxWorkers: 1,
+      setupFiles: ['./tests/setup.ts'],
+      testTimeout: 10_000,
+      onUnhandledError(error) {
+        return !isHandledValidationError(error)
       },
-    }),
-  ],
-  test: {
-    env: loadEnv(mode, process.cwd(), ''),
-    isolate: false,
-    maxWorkers: 1,
-    setupFiles: ['./tests/setup.ts'],
-    testTimeout: 10_000,
-    onUnhandledError(error) {
-      return !isHandledValidationError(error)
     },
-  },
-}))
+  }
+})
