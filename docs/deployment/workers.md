@@ -47,11 +47,12 @@ Add these **build variables** (do **not** put production IDs into tracked `wrang
 
 Under **Settings → Variables and Secrets**, add:
 
-| Variable             | Type             | Purpose                                                                                          |
-| -------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
-| `NUXT_SITE_TOKEN`    | Encrypted secret | Dashboard login password and API password (at least 8 characters, no whitespace, keep it stable) |
-| `NUXT_CF_ACCOUNT_ID` | Variable         | Recommended for analytics                                                                        |
-| `NUXT_CF_API_TOKEN`  | Encrypted secret | Recommended for analytics                                                                        |
+| Variable             | Type             | Purpose                                                                             |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| `NUXT_SITE_TOKEN`    | Encrypted secret | Dashboard/human bearer token (at least 8 characters, no whitespace, keep it stable) |
+| `NUXT_API_TOKEN`     | Encrypted secret | Optional dedicated machine/API bearer token; keep separate from `NUXT_SITE_TOKEN`   |
+| `NUXT_CF_ACCOUNT_ID` | Variable         | Recommended for analytics                                                           |
+| `NUXT_CF_API_TOKEN`  | Encrypted secret | Recommended for analytics                                                           |
 
 Analytics details: [Analytics and Realtime](/features/analytics). Full list: [configuration](/configuration/).
 

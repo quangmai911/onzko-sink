@@ -8,7 +8,7 @@ defineRouteMeta({
           bearerAuth: {
             type: 'http',
             scheme: 'bearer',
-            description: 'Use NUXT_SITE_TOKEN as the bearer token',
+            description: 'Use NUXT_SITE_TOKEN for human access or NUXT_API_TOKEN for machine access',
           },
         },
       },

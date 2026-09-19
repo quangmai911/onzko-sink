@@ -19,6 +19,31 @@ describe('/api/verify', () => {
     })
   })
 
+  it('accepts a dedicated API token for machine authentication', async () => {
+    const apiToken = import.meta.env.NUXT_API_TOKEN
+
+    expect(apiToken).toBeTruthy()
+    expect(apiToken).not.toBe(import.meta.env.NUXT_SITE_TOKEN)
+
+    const response = await fetch('/api/verify', {
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+      },
+    })
+
+    expect(response.status).toBe(200)
+
+    const data = await response.json() as VerifyResponse
+    expect(data).toMatchObject({
+      name: 'Sink',
+      url: 'https://sink.cool',
+      authMethod: 'api-token',
+      userID: 'machine',
+      userEmail: 'machine@localhost',
+      accessEnabled: false,
+    })
+  })
+
   it('returns 401 when accessing without auth', async () => {
     const response = await fetch('/api/verify')
     expect(response.status).toBe(401)

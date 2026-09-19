@@ -19,6 +19,7 @@ export default eventHandler((event) => {
   if (
     (
       authMethod !== 'site-token'
+      && authMethod !== 'api-token'
       && authMethod !== 'access-user'
       && authMethod !== 'access-service'
     )
