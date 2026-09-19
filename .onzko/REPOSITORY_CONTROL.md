@@ -59,27 +59,29 @@ master and production were identical when the production branch was established.
 
 Use:
 
+```text
 UPSTREAM CHANGE
-    ->
+    ↓
 RELEVANCE / SECURITY REVIEW
-    ->
+    ↓
 SYNC master
-    ->
+    ↓
 CREATE upgrade branch
-    ->
+    ↓
 TEST
-    ->
+    ↓
 PULL REQUEST
-    ->
+    ↓
 production
-    ->
+    ↓
 STAGING
-    ->
+    ↓
 PRODUCTION APPROVAL
-    ->
+    ↓
 DEPLOY
-    ->
+    ↓
 VERIFY
+```
 
 Upstream changes must not automatically become ONZKO production changes.
 
