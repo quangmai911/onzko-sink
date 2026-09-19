@@ -91,6 +91,10 @@ function setCellButton(element: unknown, index: number) {
   cellButtons.value[index] = element instanceof HTMLButtonElement ? element : undefined
 }
 
+function getCellButtonRef(index: number) {
+  return (element: unknown) => setCellButton(element, index)
+}
+
 function setTooltipOpen(index: number, open: boolean) {
   if (open) {
     openTooltipIndex.value = index
@@ -288,7 +292,7 @@ watch([effectiveTimeRange, effectiveFilters, retryKey], async (_values, _oldValu
                   >
                     <TooltipTrigger as-child>
                       <button
-                        :ref="element => setCellButton(element, arrayIdx * hours.length + hour)"
+                        :ref="getCellButtonRef(arrayIdx * hours.length + hour)"
                         type="button"
                         class="
                           relative block size-full rounded-sm border-0 p-0
