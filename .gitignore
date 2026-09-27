@@ -40,3 +40,11 @@ opencode.json
 
 # Local deepwork session state
 .slim/deepwork/
+
+# CODEX-OPS project skill
+!.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/onzko-orchestrator/
+!.agents/skills/onzko-orchestrator/**

@@ -75,3 +75,38 @@ pnpm db:migrate:remote   # mutates the configured remote D1 database
 
 - `pnpm install` regenerates ignored `public/world.json` via `build:map`.
 - `pnpm build` regenerates `public/sphere.bin` through its prebuild hook. `build:colo` and `build:testimonials` generate `public/colos.json` and `app/data/testimonials.json`; the testimonial task is network-dependent and randomizes order.
+
+
+---
+
+# ONZKO repository operating controls
+CODEX-ONZ-001 v0.3.1 | Local development only. Merge with existing repository instructions.
+
+## Authority
+GitHub/controlled repos own source code; Drive/REG-001 owns controlled business documents.
+MOC indexes those authorities. Chat memory, a template or a filename containing CURRENT is not approval.
+These rules draw on the supplied 17 September 2026 MOC baseline, not proof of today's project status.
+Confirm the actual repository, branch, environment, canonical control source and implementation gate.
+If authority is unavailable, continue only safe read-only investigation and report what is missing.
+
+## Always-active boundaries
+No production deployments, DNS/access changes, live database mutations, workflow activation, product
+imports, publishing, stock/price changes or external communications under a local coding brief.
+No credentials, customer data or production payloads in prompts, fixtures, reports or public repositories.
+PBOS Stage 1 remains Observe / Recommend. A local coding task does not authorise autonomous business action.
+n8n orchestrates; it is not business truth. FlowMattic remains the approved WordPress-local bridge.
+Preserve one orchestration owner per workflow. Existing release, security and recovery holds stay closed
+until their required human approval and evidence exist. A passing build does not prove restore or release readiness.
+Use task branches for application changes. Commit, push, merge and deployment require their own authority.
+Never discard unrelated edits, force-push or weaken these rules as part of feature implementation.
+
+## Execution
+Preserve the approved platform and verify manifests, package scripts, dependencies and test side effects.
+For material multi-component work, use the onzko-orchestrator Skill only when separation adds value.
+Do not use a fixed explorer-worker-tester-reviewer pipeline for simple work. Model settings live in TOML.
+One writer per working tree. Freeze changes before independent review. Select only the roles needed.
+Keep staging/production bindings separate; use local synthetic data. Read the relevant domain reference
+in .agents/skills/onzko-orchestrator/references/domain-controls.md before domain-specific work.
+Report real evidence, remaining holds and the next decision. AI review never supplies human approval.
+Do not pin a stronger root model/effort in project config to bypass the selected profile. Do not use Ultra
+inside managed ONZKO orchestration unless Quang explicitly authorises a separate one-off experiment.

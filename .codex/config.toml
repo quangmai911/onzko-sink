@@ -1,0 +1,8 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+# CODEX-OPS v0.3. Merge, do not overwrite an existing project config.
+# Deliberately NO model, sandbox_mode, approval_policy, features or agents.enabled:
+# repository values would override named user profiles, including root-only mode.
+[agents]
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "high"
