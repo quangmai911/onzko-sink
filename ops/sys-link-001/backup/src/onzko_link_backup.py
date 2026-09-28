@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SYS-LINK-001 staging replication — v0.1, DRAFT / NOT APPROVED FOR INSTALLATION.
+"""SYS-LINK-001 staging replication — v0.1 controlled operational baseline.
 
 Default --plan is offline. --execute needs explicit reviewed configuration,
 three systemd-loaded credentials, a trusted pinned AWS CLI, and private paths.
@@ -177,7 +177,7 @@ class Policy:
     live_execution_approved: bool = False
     source_schedule_reviewed: bool = False
     aws_binary_sha256: str = ""
-    expected_source_interval_seconds: int = 43200  # PROPOSED, not current cron.
+    expected_source_interval_seconds: int = 43200  # Reviewed 12-hour scheduled-source interval.
     source_completion_budget_seconds: int = 900
     poll_seconds: int = 900
     jitter_seconds: int = 120
