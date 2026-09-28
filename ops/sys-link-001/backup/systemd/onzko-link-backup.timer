@@ -1,0 +1,15 @@
+# SYS-LINK-001 — controlled staging replication poll timer.
+# Controlled source: quangmai911/onzko-sink.
+# Enable only after the approved unattended-operation commissioning gate.
+[Unit]
+Description=SYS-LINK-001 staging replication poll
+
+[Timer]
+OnCalendar=*-*-* *:00/15:00 UTC
+RandomizedDelaySec=2min
+AccuracySec=1min
+Persistent=true
+Unit=onzko-link-backup.service
+
+[Install]
+WantedBy=timers.target
