@@ -1,0 +1,14 @@
+# DRAFT v0.1 — REVIEW ONLY. Do not enable.
+# PROPOSED: independent polling every 15 minutes, not the Cloudflare export cron.
+[Unit]
+Description=SYS-LINK-001 staging replication poll (proposed, not commissioned)
+
+[Timer]
+OnCalendar=*-*-* *:00/15:00 UTC
+RandomizedDelaySec=2min
+AccuracySec=1min
+Persistent=true
+Unit=onzko-link-backup.service
+
+[Install]
+WantedBy=timers.target
