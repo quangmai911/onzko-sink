@@ -33,9 +33,11 @@ Controlled Git branch:
 
 `production`
 
-Current known-good staging Worker version:
+Restore-tested staging Worker version (20 September 2026):
 
 `55226e24-ad99-4baf-832b-5bf84eb796f8`
+
+Verify the currently deployed Worker version before any rollback or deployment comparison.
 
 D1:
 
@@ -316,8 +318,6 @@ Verify:
 - no temporary privileged credential remains;
 - temporary recovery artefacts are removed;
 - incident/change evidence is recorded.
-
----
 
 ---
 
