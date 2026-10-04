@@ -1,6 +1,6 @@
 {
-  "live_execution_approved": false,
-  "source_schedule_reviewed": false,
+  "live_execution_approved": true,
+  "source_schedule_reviewed": true,
   "aws_binary_sha256": "16f01f23db9499c2b14e785cff20f3b284e5f1193681c39473542a70f17fff9f",
   "expected_source_interval_seconds": 43200,
   "source_completion_budget_seconds": 900,
