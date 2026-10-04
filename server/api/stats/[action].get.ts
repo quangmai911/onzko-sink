@@ -37,7 +37,7 @@ function weightedReferers(column: string): RawBuilder<number> {
 
 function query2sql(query: z.infer<typeof StatsExportQuerySchema>, event: H3Event) {
   const filter = buildAnalyticsFilter(query)
-  const { dataset } = useRuntimeConfig(event)
+  const dataset = getAnalyticsDataset(event)
   const analyticsQuery = createAnalyticsQuery(dataset)
   const filteredQuery = filter ? analyticsQuery.where(filter) : analyticsQuery
 

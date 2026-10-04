@@ -4,7 +4,7 @@ import { QuerySchema } from '#shared/schemas/query'
 
 function query2sql(query: Query, event: H3Event) {
   const filter = buildAnalyticsFilter(query)
-  const { dataset } = useRuntimeConfig(event)
+  const dataset = getAnalyticsDataset(event)
   const limit = Math.max(0, Math.floor(query.limit))
   const analyticsQuery = createAnalyticsQuery(dataset)
     .where('double1', '!=', sql.lit(0))
