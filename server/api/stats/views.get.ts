@@ -19,7 +19,7 @@ const ViewsQuerySchema = QuerySchema.extend({
 
 function query2sql(query: z.infer<typeof ViewsQuerySchema>, event: H3Event) {
   const filter = buildAnalyticsFilter(query)
-  const { dataset } = useRuntimeConfig(event)
+  const dataset = getAnalyticsDataset(event)
   const timezone = getSafeTimezone(query.clientTimezone)
   const analyticsQuery = createAnalyticsQuery(dataset)
   const filteredQuery = filter ? analyticsQuery.where(filter) : analyticsQuery

@@ -13,7 +13,7 @@ const MetricsQuerySchema = QuerySchema.extend({
 
 function query2sql(query: z.infer<typeof MetricsQuerySchema>, event: H3Event) {
   const filter = buildAnalyticsFilter(query)
-  const { dataset } = useRuntimeConfig(event)
+  const dataset = getAnalyticsDataset(event)
   const limit = Math.max(0, Math.floor(query.limit))
   const metricColumn = logsMap[query.type] as string
   const analyticsQuery = createAnalyticsQuery(dataset)
