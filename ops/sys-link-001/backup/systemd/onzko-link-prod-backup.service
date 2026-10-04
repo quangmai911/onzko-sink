@@ -1,0 +1,49 @@
+# SYS-LINK-001 — controlled production backup replication service.
+# Controlled source: quangmai911/onzko-sink.
+# Installation/execution requires a separate approved commissioning gate.
+[Unit]
+Description=SYS-LINK-001 production R2 to B2 copy with separate-identity read-back
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=onzko-link-backup
+Group=onzko-link-backup
+ExecStart=/usr/bin/python3 -I /usr/local/lib/onzko-link-backup/onzko_link_backup.py --profile production --execute --config /etc/onzko-link-prod-backup/config.json
+WorkingDirectory=/var/lib/onzko-link-prod-backup
+LoadCredential=r2-reader.json:/etc/onzko-link-prod-backup/credentials/r2-reader.json
+LoadCredential=b2-writer.json:/etc/onzko-link-prod-backup/credentials/b2-writer.json
+LoadCredential=b2-reader.json:/etc/onzko-link-prod-backup/credentials/b2-reader.json
+StateDirectory=onzko-link-prod-backup
+StateDirectoryMode=0700
+RuntimeDirectory=onzko-link-prod-backup
+RuntimeDirectoryMode=0700
+UMask=0077
+TimeoutStartSec=12min
+Restart=no
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+LimitCORE=0
+MemoryMax=256M
+TasksMax=32
+CPUQuota=50%
+Nice=10
+IOSchedulingClass=idle
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=onzko-link-prod-backup

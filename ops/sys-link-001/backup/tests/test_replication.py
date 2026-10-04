@@ -105,6 +105,7 @@ class FakeAWS:
 
 class ReplicationTests(unittest.TestCase):
     def setUp(self):
+        m.configure_profile("staging")
         self.tmp = tempfile.TemporaryDirectory()
         self.path = Path(self.tmp.name)
         self.state, self.work = self.path / "state", self.path / "work"
@@ -436,6 +437,90 @@ class ReplicationTests(unittest.TestCase):
     def test_systemd_acl_malformed_rejected(self):
         for raw in (b"", b"broken", m.struct.pack("<I", 999)):
             self.assertFalse(m.credential_acl_ok(raw, 1234))
+
+
+    def test_staging_profile_preserves_commissioned_identity(self):
+        m.configure_profile("staging")
+        self.assertEqual(m.ACTIVE_PROFILE, "staging")
+        self.assertEqual(m.R2_BUCKET, "onzko-link-stg-backups")
+        self.assertEqual(m.B2_PREFIX, "systems/sys-link-001/staging/")
+        self.assertEqual(m.STATE_PATH, Path("/var/lib/onzko-link-backup"))
+        self.assertEqual(m.WORK_PATH, Path("/run/onzko-link-backup"))
+
+    def test_production_profile_is_fixed_and_separate(self):
+        try:
+            m.configure_profile("production")
+            self.assertEqual(m.ACTIVE_PROFILE, "production")
+            self.assertEqual(m.R2_BUCKET, "onzko-link-prod-backups")
+            self.assertEqual(m.B2_PREFIX, "systems/sys-link-001/production/")
+            self.assertEqual(m.STATE_PATH, Path("/var/lib/onzko-link-prod-backup"))
+            self.assertEqual(m.WORK_PATH, Path("/run/onzko-link-prod-backup"))
+
+            valid = (
+                "systems/sys-link-001/production/snapshots/"
+                "20261004T120000.000Z/"
+                + "a" * 64
+                + "/links.json"
+            )
+            staging = valid.replace(
+                "systems/sys-link-001/production/",
+                "systems/sys-link-001/staging/",
+            )
+
+            self.assertTrue(m.DEST_RE.fullmatch(valid))
+            self.assertFalse(m.DEST_RE.fullmatch(staging))
+        finally:
+            m.configure_profile("staging")
+
+    def test_unknown_profile_fails_closed(self):
+        with self.assertRaisesRegex(m.BackupError, "profile_not_allowed"):
+            m.configure_profile("anything-else")
+        self.assertEqual(m.ACTIVE_PROFILE, "staging")
+
+    def test_production_offline_plan_has_only_approved_storage_identity(self):
+        try:
+            m.configure_profile("production")
+            result = m.offline_plan(self.policy)
+            self.assertEqual(result["profile"], "production")
+            self.assertEqual(
+                result["source"]["bucket"],
+                "onzko-link-prod-backups",
+            )
+            self.assertEqual(
+                result["destination"]["prefix"],
+                "systems/sys-link-001/production/",
+            )
+            self.assertEqual(
+                result["destination"]["bucket"],
+                "onzko-automation-prod-backups",
+            )
+        finally:
+            m.configure_profile("staging")
+
+    def test_production_roundtrip_cannot_escape_production_prefix(self):
+        try:
+            m.configure_profile("production")
+            result = self.run_job()
+            self.assertEqual(result["status"], "verified")
+
+            puts = [
+                args
+                for role, operation, args, _ in self.fake.calls
+                if role == "b2-writer" and operation == "put-object"
+            ]
+
+            self.assertEqual(len(puts), 2)
+
+            for args in puts:
+                key = args[args.index("--key") + 1]
+                self.assertTrue(
+                    key.startswith("systems/sys-link-001/production/")
+                )
+                self.assertFalse(
+                    key.startswith("systems/sys-link-001/staging/")
+                )
+        finally:
+            m.configure_profile("staging")
 
 
 if __name__ == "__main__":

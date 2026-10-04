@@ -1,11 +1,32 @@
-# SYS-LINK-001 — Staging Backup Replication
+# SYS-LINK-001 — Controlled Backup Replication Profiles
 
 ## Purpose
 
 Replicate verified scheduled Sink logical backups from Cloudflare R2 to the
 independent Backblaze B2 recovery estate.
 
-## Runtime
+## Controlled profiles
+
+The replication implementation permits only two hard-coded environment
+identities:
+
+| Profile | Cloudflare R2 source | Backblaze B2 prefix |
+|---|---|---|
+| `staging` | `onzko-link-stg-backups` | `systems/sys-link-001/staging/` |
+| `production` | `onzko-link-prod-backups` | `systems/sys-link-001/production/` |
+
+The profile selector does not accept arbitrary R2 buckets, B2 prefixes,
+storage endpoints or destination buckets.
+
+`staging` remains the existing commissioned behaviour.
+
+`production` is source-controlled but is not live-authorised merely because
+the profile exists. Production installation, credentials, source scheduling,
+first replication, recovery verification and unattended timer operation each
+remain subject to later LINK-06F commissioning gates.
+
+## Staging Runtime
+
 
 Host:
 

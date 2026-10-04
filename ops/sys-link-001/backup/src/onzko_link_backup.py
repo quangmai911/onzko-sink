@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""SYS-LINK-001 staging replication — v0.1 controlled operational baseline.
+"""SYS-LINK-001 backup replication — v0.2 controlled operational baseline.
 
-Default --plan is offline. --execute needs explicit reviewed configuration,
-three systemd-loaded credentials, a trusted pinned AWS CLI, and private paths.
-No boto3 dependency, shell execution, key provisioning or remote delete calls.
+Default --plan is offline. --execute needs an allowlisted environment profile,
+explicit reviewed configuration, three systemd-loaded credentials, a trusted
+pinned AWS CLI, and private paths. No boto3 dependency, shell execution, key
+provisioning or remote delete calls.
 """
 from __future__ import annotations
 
@@ -27,22 +28,42 @@ import time
 from typing import Any, Callable, Iterator
 from urllib.parse import urlsplit
 
-VERSION = "0.1"
+VERSION = "0.2"
 SYSTEM = "SYS-LINK-001"
 R2_ENDPOINT = "https://8ec92aac91a6fd67882bcbe1f94d4d98.r2.cloudflarestorage.com"
-R2_BUCKET = "onzko-link-stg-backups"
 R2_PREFIX = "backups/links-"
 B2_ENDPOINT = "https://s3.us-west-004.backblazeb2.com"
 B2_BUCKET = "onzko-automation-prod-backups"
-B2_PREFIX = "systems/sys-link-001/staging/"
 AWS_PATH = "/usr/local/lib/onzko-link-backup/aws-cli/v2/current/bin/aws"
 AWS_VERSION = "2.36.44"
 DEFAULT_CONFIG = "/etc/onzko-link-backup/config.json"
-STATE_PATH = Path("/var/lib/onzko-link-backup")
-WORK_PATH = Path("/run/onzko-link-backup")
 SOURCE_RE = re.compile(r"backups/links-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.\d{3}Z)\.json\Z")
-DEST_RE = re.compile(r"systems/sys-link-001/staging/snapshots/\d{8}T\d{6}\.\d{3}Z/[0-9a-f]{64}/(?:links|manifest)\.json\Z")
 HASH_RE = re.compile(r"[0-9a-f]{64}\Z")
+
+PROFILES = {
+    "staging": {
+        "r2_bucket": "onzko-link-stg-backups",
+        "b2_prefix": "systems/sys-link-001/staging/",
+        "state_path": Path("/var/lib/onzko-link-backup"),
+        "work_path": Path("/run/onzko-link-backup"),
+    },
+    "production": {
+        "r2_bucket": "onzko-link-prod-backups",
+        "b2_prefix": "systems/sys-link-001/production/",
+        "state_path": Path("/var/lib/onzko-link-prod-backup"),
+        "work_path": Path("/run/onzko-link-prod-backup"),
+    },
+}
+
+ACTIVE_PROFILE = "staging"
+R2_BUCKET = PROFILES["staging"]["r2_bucket"]
+B2_PREFIX = PROFILES["staging"]["b2_prefix"]
+STATE_PATH = PROFILES["staging"]["state_path"]
+WORK_PATH = PROFILES["staging"]["work_path"]
+DEST_RE = re.compile(
+    re.escape(B2_PREFIX)
+    + r"snapshots/\d{8}T\d{6}\.\d{3}Z/[0-9a-f]{64}/(?:links|manifest)\.json\Z"
+)
 
 
 class BackupError(Exception):
@@ -52,6 +73,24 @@ class BackupError(Exception):
 def require(test: bool, code: str) -> None:
     if not test:
         raise BackupError(code)
+
+
+def configure_profile(name: str) -> None:
+    """Select one fixed environment identity; arbitrary storage targets are prohibited."""
+    global ACTIVE_PROFILE, R2_BUCKET, B2_PREFIX, STATE_PATH, WORK_PATH, DEST_RE
+
+    profile = PROFILES.get(name)
+    require(profile is not None, "profile_not_allowed")
+
+    ACTIVE_PROFILE = name
+    R2_BUCKET = profile["r2_bucket"]
+    B2_PREFIX = profile["b2_prefix"]
+    STATE_PATH = profile["state_path"]
+    WORK_PATH = profile["work_path"]
+    DEST_RE = re.compile(
+        re.escape(B2_PREFIX)
+        + r"snapshots/\d{8}T\d{6}\.\d{3}Z/[0-9a-f]{64}/(?:links|manifest)\.json\Z"
+    )
 
 
 def utcnow() -> datetime:
@@ -558,7 +597,8 @@ def perform_run(gateway: AwsGateway, policy: Policy, state: Path, work: Path,
 
 
 def offline_plan(policy: Policy) -> dict[str, Any]:
-    return {"system": SYSTEM, "draft_version": VERSION, "mode": "OFFLINE_PLAN",
+    return {"system": SYSTEM, "profile": ACTIVE_PROFILE,
+            "draft_version": VERSION, "mode": "OFFLINE_PLAN",
             "network_calls": 0, "credentials_loaded": False, "installation_authorised": False,
             "source": {"endpoint": R2_ENDPOINT, "bucket": R2_BUCKET, "prefix": R2_PREFIX},
             "destination": {"endpoint": B2_ENDPOINT, "bucket": B2_BUCKET, "prefix": B2_PREFIX},
@@ -573,11 +613,13 @@ def offline_plan(policy: Policy) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default=DEFAULT_CONFIG)
+    parser.add_argument("--profile", default="staging")
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument("--plan", action="store_true", help="Offline; default. No credential or cloud access.")
     modes.add_argument("--execute", action="store_true", help="Requires separately reviewed live configuration.")
     args = parser.parse_args(argv)
     try:
+        configure_profile(args.profile)
         path = Path(args.config)
         if args.execute:
             trusted_root_path(path)
