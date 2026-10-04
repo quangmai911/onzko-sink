@@ -1,0 +1,14 @@
+# SYS-LINK-001 — controlled production replication poll timer.
+# DO NOT enable until the approved unattended-operation commissioning gate.
+[Unit]
+Description=SYS-LINK-001 production replication poll
+
+[Timer]
+OnCalendar=*-*-* *:00/15:00 UTC
+RandomizedDelaySec=2min
+AccuracySec=1min
+Persistent=true
+Unit=onzko-link-prod-backup.service
+
+[Install]
+WantedBy=timers.target
